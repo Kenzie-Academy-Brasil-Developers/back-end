@@ -1,10 +1,12 @@
 import  express, {json , Application} from 'express'
-import { firstTeste } from './logics/teste'
+import { createDeveloper } from './logics/developer'
 import {startDataBse} from './database'
 const app: Application = express()
 app.use(json())
 
-app.get('/', firstTeste)
+app.post('/developers', createDeveloper)
+
+
 
 const PORT:Number = 3000
 const  runningMsg :string = `Server running on http://localhost:${PORT}`;

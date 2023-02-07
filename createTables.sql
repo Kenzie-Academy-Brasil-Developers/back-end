@@ -35,3 +35,6 @@ CREATE TABLE IF NOT EXISTS  projects_technologies(
 );
 
 INSERT INTO technologies("name") VALUES('javaScript') RETURNING*;
+ALTER TABLE developers ADD COLUMN "developerInfoId" INTEGER UNIQUE ;
+ALTER TABLE developers ADD FOREIGN KEY ("developerInfoId") REFERENCES developer_infos("id");
+INSERT INTO developers ("name","email") VALUES ('teste','teste@mail') RETURNING*;

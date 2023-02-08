@@ -48,6 +48,25 @@ export const validadeUpdateDeveloper = (obj:any):IDeveloper|any=>{
     }
     return obj 
 }
+export const validadeUpdateDeveloperInfo = (obj:any):IDeveloper|any=>{
+
+    if(obj.developerSince===undefined && obj.preferredOS===undefined){
+        throw new Error(`At least one of those keys must be send,key:developerSince,preferredOS`);       
+    }
+    const keys:string[] = Object.keys(obj) 
+
+    const verify = ['developerSince','preferredOS']
+    
+    const verifyResult:boolean = keys.every(element=>verify.includes(element))
+
+
+    if(!verifyResult ){
+        const keyes =  verify.join(',')
+        throw new Error(`it is only allowed to update one of these keys:${keyes}`); 
+    }
+    return obj 
+}
+
 export const createDeveloper = async (req:Request , res:Response): Promise<Response> =>{
    try{
     const validate=validadeDeveloper(req.body)
@@ -237,4 +256,57 @@ export const updateDeveloper = async(req:Request , res:Response):Promise<Respons
         console.log(error)
         return res.status(500).json({message:error})
     }
+}
+
+export const updateInfoDeveloperId = async (req:Request , res:Response):Promise<Response>=>{
+   try{
+    validadeUpdateDeveloperInfo(req.body)
+    const id:number = parseInt(req.params.id)
+    const keys = Object.keys(req.body)
+    const values = Object.values(req.body)
+
+    let queryString:string = `
+    SELECT *
+    FROM developers
+    WHERE 
+    id=$1;
+`
+    const queryConfig:QueryConfig={
+        text:queryString,values:[id]
+    }
+    const queryResult=  await client.query(queryConfig)
+
+    const idInfo = queryResult.rows[0].developerInfoId
+    
+
+     queryString = format(`
+        UPDATE developer_infos
+        SET(%I)=ROW(%L)
+        WHERE 
+        id=$1
+        RETURNING *
+    `,keys,values)
+
+    const queryConfigInfo :QueryConfig={
+        text:queryString,
+        values:[idInfo]
+    }
+
+    const queryResultInfo=  await client.query(queryConfigInfo)
+   
+
+
+
+    return res.status(200).json(queryResultInfo.rows[0])
+   }
+   catch(error:any){
+    if(error.message.includes('invalid input value for enum \"OS\":')){
+        return res.status(409).json({message:"preferredOS permission :Windows,Linux,MacOS"})
+    }
+    if(error instanceof Error){
+        return res.status(400).json({message:error.message})
+    }
+    console.log(error)
+    return res.status(500).json({message:error})
+   }
 }

@@ -1,10 +1,14 @@
 import  express, {json , Application} from 'express'
-import { createDeveloper } from './logics/developer'
+import { createDeveloper, createInfoDeveloper, readDevelopers, readDevelopersId } from './logics/developer'
 import {startDataBse} from './database'
+import {verifyIdDeveloper} from './middlewares/middlewares.developer'
 const app: Application = express()
 app.use(json())
 
 app.post('/developers', createDeveloper)
+app.get('/developers', readDevelopers )
+app.get('/developers/:id',verifyIdDeveloper,  readDevelopersId )
+app.post('/developers/:id/infos',verifyIdDeveloper,  createInfoDeveloper )
 
 
 

@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS technologies(
 "id" SERIAL PRIMARY KEY,
 "name" VARCHAR(30) NOT NULL
 );
-
+ 
 
 CREATE TABLE IF NOT EXISTS  projects_technologies(
 "id" SERIAL PRIMARY KEY,
@@ -38,3 +38,4 @@ INSERT INTO technologies("name") VALUES('javaScript') RETURNING*;
 ALTER TABLE developers ADD COLUMN "developerInfoId" INTEGER UNIQUE ;
 ALTER TABLE developers ADD FOREIGN KEY ("developerInfoId") REFERENCES developer_infos("id");
 INSERT INTO developers ("name","email") VALUES ('teste','teste@mail') RETURNING*;
+SELECT dv.*,dvi."developerSince",dvi."preferredOS" FROM developers dv JOIN developer_infos dvi ON dv."developerInfoId" = dvi.id;

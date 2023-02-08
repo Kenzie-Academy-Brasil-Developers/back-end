@@ -1,6 +1,6 @@
 import { Request , Response } from 'express';
 import format from 'pg-format';
-import {DeveloperResult, IDeveloper, RequeridDeveloper,DeveloperResultReacion, RequeridDeveloperInfo, DeveloperInfoResult} from '../interfaces/interfaceDeveloper'
+import {DeveloperResult, IDeveloper, RequeridDeveloper,DeveloperResultReacion, RequeridDeveloperInfo, DeveloperInfoResult, IDeveloperBody} from '../interfaces/interfaceDeveloper'
 import { client } from '../database';
 import { QueryConfig } from 'pg';
 
@@ -29,6 +29,24 @@ export const validadeDeveloperInfo = (obj:any):IDeveloper|any=>{
         throw new Error(`Missing required keys:${keyes}`); 
     }
     return obj
+}
+export const validadeUpdateDeveloper = (obj:any):IDeveloper|any=>{
+
+    if(obj.name===undefined && obj.email===undefined){
+        throw new Error(`At least one of those keys must be send,key:name,email`);       
+    }
+    const keys:string[] = Object.keys(obj) 
+
+    const verify = ['name','email']
+    
+    const verifyResult:boolean = keys.every(element=>verify.includes(element))
+
+
+    if(!verifyResult ){
+        const keyes =  verify.join(',')
+        throw new Error(`it is only allowed to update one of these keys:${keyes}`); 
+    }
+    return obj 
 }
 export const createDeveloper = async (req:Request , res:Response): Promise<Response> =>{
    try{
@@ -94,19 +112,15 @@ export const readDevelopers = async(req:Request , res:Response):Promise<Response
 export const readDevelopersId = async(req:Request , res:Response):Promise<Response>=>{
     const id :number = parseInt(req.params.id) 
 
-  /*   const queryString:string =`
+    const queryString:string =`
     SELECT dv.*,
         dvi."developerSince",
         dvi."preferredOS" 
     FROM developers dv 
     JOIN developer_infos dvi 
-    ON dv."developerInfoId" = dvi.id;  
-    ` */
-    const queryString:string =`
-    SELECT *
-     FROM developers
-     WHERE
-        id=$1
+    ON dv."developerInfoId" = dvi.id
+    WHERE
+      dv.id=$1
     ;  
     `
     const queryConfig :QueryConfig={
@@ -115,7 +129,22 @@ export const readDevelopersId = async(req:Request , res:Response):Promise<Respon
     }
 
     const queryResult:DeveloperResultReacion = await client.query(queryConfig)
+    if(queryResult.rows.length===0){
+        const queryStringFail:string =`
+        SELECT *
+        FROM developers
+        WHERE
+        id=$1 ;
+        `
+        const queryConfigFail :QueryConfig={
+            text:queryStringFail,
+            values:[id]
+        }
 
+        const queryResult:DeveloperResult = await client.query(queryConfigFail)
+        return res.status(200).json(queryResult.rows[0])
+
+    }
     return res.status(200).json(queryResult.rows[0])
 
 }
@@ -150,12 +179,12 @@ export const createInfoDeveloper = async(req:Request , res:Response):Promise<Res
         text:queryStringUpdate,
         values:[queryResult.rows[0].id,id]
     }
-    
+
     await client.query(queryConfigUpdate)
 
    
 
-    return res.status(200).json(queryResult.rows[0])
+    return res.status(201).json(queryResult.rows[0])
   }
   catch(error:any){
     if(error.message.includes('invalid input value for enum \"OS\"')){
@@ -171,4 +200,41 @@ export const createInfoDeveloper = async(req:Request , res:Response):Promise<Res
 
   
 
+}
+
+export const updateDeveloper = async(req:Request , res:Response):Promise<Response>=>{
+    try{
+        validadeUpdateDeveloper(req.body)
+    const id:number = parseInt(req.params.id)
+    const keys :string[]= Object.keys(req.body) 
+    const value :string[]= Object.values(req.body) 
+
+    const queryString :string = format(`
+    
+    UPDATE developers
+    SET(%I) = ROW(%L)
+    WHERE 
+     id=$1
+     RETURNING *
+     ;
+    `,keys,value)
+
+    const queryConfig:QueryConfig={
+        text:queryString,
+        values:[id]
+    }
+
+    const queryResult:DeveloperResult= await client.query(queryConfig)
+    return res.status(200).json(queryResult.rows[0])
+    }
+    catch(error:any){
+        if(error.message.includes('duplicate key value violates unique constraint "developers_email_key')){
+            return res.status(409).json({message:"email already exists"})
+        }
+        if(error instanceof Error){
+            return res.status(400).json({message:error.message})
+        }
+        console.log(error)
+        return res.status(500).json({message:error})
+    }
 }

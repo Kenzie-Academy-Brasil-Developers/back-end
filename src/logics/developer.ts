@@ -1,6 +1,6 @@
 import { Request , Response } from 'express';
 import format from 'pg-format';
-import {DeveloperResult, IDeveloper, RequeridDeveloper,DeveloperResultReacion, RequeridDeveloperInfo} from '../interfaces/interfaceDeveloper'
+import {DeveloperResult, IDeveloper, RequeridDeveloper,DeveloperResultReacion, RequeridDeveloperInfo, DeveloperInfoResult} from '../interfaces/interfaceDeveloper'
 import { client } from '../database';
 import { QueryConfig } from 'pg';
 
@@ -65,9 +65,10 @@ export const readDevelopers = async(req:Request , res:Response):Promise<Response
 
 
     const queryString:string =`
-    SELECT dv.*,
-        dvi."developerSince",
-        dvi."preferredOS" 
+    SELECT
+         dv.*,
+         dvi."developerSince",
+         dvi."preferredOS" 
     FROM developers dv 
     JOIN developer_infos dvi 
     ON dv."developerInfoId" = dvi.id;  
@@ -127,19 +128,32 @@ export const createInfoDeveloper = async(req:Request , res:Response):Promise<Res
     const keys:string[] = Object.keys(verifyResult)
     const values: string[]=  Object.values(verifyResult)
     
-    console.log(id)
+
     const queryString:string =format(`
     INSERT INTO developer_infos (%I)
      VALUES(%L)
         RETURNING *
     ;  
     `,keys,values)
-   /*  const queryConfig :QueryConfig={
-        text:queryString,
-        values:[id]
-    } */
+    
+    const queryResult:DeveloperInfoResult = await client.query(queryString)
 
-    const queryResult:DeveloperResultReacion = await client.query(queryString)
+
+   const queryStringUpdate:string =`
+    UPDATE developers
+      SET("developerInfoId") = ROW($1)
+      WHERE 
+       id=$2
+       RETURNING *; 
+    `
+    const queryConfigUpdate:QueryConfig={
+        text:queryStringUpdate,
+        values:[queryResult.rows[0].id,id]
+    }
+    
+    await client.query(queryConfigUpdate)
+
+   
 
     return res.status(200).json(queryResult.rows[0])
   }

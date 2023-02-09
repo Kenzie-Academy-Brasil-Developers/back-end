@@ -4,7 +4,11 @@ import {client} from '../database'
 import { DeveloperResultReacion} from '../interfaces/interfaceDeveloper'
 
 export const verifyIdDeveloper = async(req:Request , res:Response, next:NextFunction):Promise<Response|void>=>{
-    const id :number = parseInt(req.params.id)
+    let id :number = parseInt(req.params.id)
+    if(!id){
+        id= req.body.developerId
+    }
+    
     const queryString:string =`
     SELECT *
      FROM developers

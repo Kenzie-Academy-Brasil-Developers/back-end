@@ -107,7 +107,7 @@ export const readDevelopers = async(req:Request , res:Response):Promise<Response
          dvi."developerSince",
          dvi."preferredOS" 
     FROM developers AS dv 
-    LEFT JOIN developer_infos AS dvi 
+    LEFT  OUTER JOIN developer_infos AS dvi 
     ON dv."developerInfoId" = dvi.id;`
     const queryResult:DeveloperResultReacion = await client.query(queryString)
     return res.status(200).json(queryResult.rows)

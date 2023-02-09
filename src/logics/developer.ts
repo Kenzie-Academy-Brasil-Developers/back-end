@@ -310,3 +310,33 @@ export const updateInfoDeveloperId = async (req:Request , res:Response):Promise<
     return res.status(500).json({message:error})
    }
 }
+
+export const deletDeveloper = async (req:Request , res:Response):Promise<Response>=>{
+    const id:number = parseInt(req.params.id)
+
+    let queryString:string = `
+    SELECT *
+    FROM developers
+    WHERE 
+    id=$1;
+`
+    const queryConfig:QueryConfig={
+        text:queryString,values:[id]
+    }
+    const queryResult=  await client.query(queryConfig)
+    const idInfo = queryResult.rows[0].developerInfoId
+    
+    const queryStringDelet:string=`
+    DELETE FROM developer_infos
+    WHERE
+    id=$1  
+    `
+
+    const queryConfigDelet:QueryConfig={
+        text:queryStringDelet,
+        values:[idInfo]
+    }
+     await client.query(queryConfigDelet)
+
+    return res.status(204).json()
+}

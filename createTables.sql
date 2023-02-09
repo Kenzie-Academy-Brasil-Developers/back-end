@@ -42,7 +42,14 @@ ALTER TABLE developers ADD FOREIGN KEY ("developerInfoId") REFERENCES developer_
 ALTER TABLE projects ADD COLUMN "developerId" INTEGER ;
 ALTER TABLE projects ADD FOREIGN KEY ("developerId") REFERENCES developers("id") ON DELETE CASCADE;
 
+ALTER TABLE projects_technologies ADD COLUMN "projectId" INTEGER NOT NULL ;
+ALTER TABLE projects_technologies ADD FOREIGN KEY ("projectId") REFERENCES projects("id") ON DELETE CASCADE;
+
+ALTER TABLE projects_technologies ADD COLUMN "technologyId" INTEGER   NOT NULL;
+ALTER TABLE projects_technologies ADD FOREIGN KEY ("technologyId") REFERENCES technologies("id") ON DELETE SET NULL;
+
 INSERT INTO developers ("name","email") VALUES ('teste','teste@mail') RETURNING*;
 SELECT dv.*,dvi."developerSince",dvi."preferredOS" FROM developers dv JOIN developer_infos dvi ON dv."developerInfoId" = dvi.id;
+
 
 ALTER TABLE developers DROP CONSTRAINT "developers_developerInfoId_fkey"

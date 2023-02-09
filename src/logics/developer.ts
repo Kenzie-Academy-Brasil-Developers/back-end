@@ -106,25 +106,10 @@ export const readDevelopers = async(req:Request , res:Response):Promise<Response
          dv.*,
          dvi."developerSince",
          dvi."preferredOS" 
-    FROM developers dv 
-    JOIN developer_infos dvi 
-    ON dv."developerInfoId" = dvi.id;  
-    `
-
-    const queryStringFail:string =`
-    SELECT *
-    FROM developers;  
-    `
-
+    FROM developers AS dv 
+    LEFT JOIN developer_infos AS dvi 
+    ON dv."developerInfoId" = dvi.id;`
     const queryResult:DeveloperResultReacion = await client.query(queryString)
-
-    if(queryResult.rows.length===0){
-        const queryResultFail = await client.query(queryStringFail)
-       
-        return res.status(200).json(queryResultFail.rows)
-    }
-
-
     return res.status(200).json(queryResult.rows)
 
 }
@@ -135,8 +120,8 @@ export const readDevelopersId = async(req:Request , res:Response):Promise<Respon
     SELECT dv.*,
         dvi."developerSince",
         dvi."preferredOS" 
-    FROM developers dv 
-    JOIN developer_infos dvi 
+    FROM developers AS dv 
+    LEFT JOIN developer_infos AS dvi 
     ON dv."developerInfoId" = dvi.id
     WHERE
       dv.id=$1
@@ -148,22 +133,6 @@ export const readDevelopersId = async(req:Request , res:Response):Promise<Respon
     }
 
     const queryResult:DeveloperResultReacion = await client.query(queryConfig)
-    if(queryResult.rows.length===0){
-        const queryStringFail:string =`
-        SELECT *
-        FROM developers
-        WHERE
-        id=$1 ;
-        `
-        const queryConfigFail :QueryConfig={
-            text:queryStringFail,
-            values:[id]
-        }
-
-        const queryResult:DeveloperResult = await client.query(queryConfigFail)
-        return res.status(200).json(queryResult.rows[0])
-
-    }
     return res.status(200).json(queryResult.rows[0])
 
 }

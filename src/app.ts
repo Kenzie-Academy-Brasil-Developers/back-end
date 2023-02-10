@@ -1,7 +1,7 @@
 import  express, {json , Application} from 'express'
 import { createDeveloper, createInfoDeveloper, deletDeveloper, readDevelopers, readDevelopersId, updateDeveloper, updateInfoDeveloperId } from './logics/developer'
 import {creatProject, deletProject, readProjects, readProjectsById, updateProject} from './logics/projects'
-import {addTecProjectById, readProjectDeveloperById} from './logics/developerAndProject'
+import {addTecProjectById, deletTecnology, readProjectDeveloperById} from './logics/developerAndProject'
 import {startDataBse} from './database'
 import {verifyIdDeveloper} from './middlewares/middlewares.developer'
 import{verifyIdProject} from  './middlewares/middlewares.projects'
@@ -24,6 +24,7 @@ app.delete('/projects/:id',verifyIdProject, deletProject)
 
 app.get('/developers/:id/projects', verifyIdDeveloper, readProjectDeveloperById)
 app.post('/projects/:id/technologies' ,verifyIdProject,addTecProjectById)
+app.delete('/projects/:id/technologies/:name',verifyIdProject,deletTecnology)
 
 
 

@@ -2,7 +2,6 @@ import { Request, Response } from 'express'
 import { QueryConfig } from 'pg'
 import {client} from '../database'
 import {DeveloperAndProjectsResult} from '../interfaces/interfaceDeveloper'
-import {RequeridTec} from '../interfaces/interfaceDeveloperAndProject'
 
 export const readProjectDeveloperById = async (req:Request , res:Response):Promise<Response>=>{
 
@@ -122,4 +121,76 @@ export const addTecProjectById =async (req:Request , res:Response):Promise<Respo
     console.log(error)
     return res.status(500).json({message:error})
    }
+}
+
+export const deletTecnology = async (req:Request , res:Response):Promise<Response>=>{
+
+    const id:number = parseInt(req.params.id)
+    const name = req.params.name
+    const queryStringTec:string= `
+    SELECT *
+     FROM technologies
+     WHERE
+     "tecName"=$1
+;
+    ` 
+   const queryConfigTec :QueryConfig={
+        text:queryStringTec,
+        values:[name]
+    }
+    const queryResultTEc = await client.query(queryConfigTec) 
+
+    if(queryResultTEc.rows.length===0){
+        return res.status(404).json({message:'Technology not supported', options:[
+            "JavaScript",
+            "Python",
+            "React",
+            "Express.js",
+            "HTML",
+            "CSS",
+            "Django",
+            "PostgreSQL",
+            "MongoDB"
+        ]})
+    }
+
+    const idTec = queryResultTEc.rows[0].id
+
+    const queryStringRelacion:string =`
+        SELECT * 
+        FROM projects_technologies
+        WHERE
+        "projectId"=$1
+        AND
+         "technologyId"=$2
+        ;
+
+    ` 
+    const queryConfigRelacion:QueryConfig={
+        text:queryStringRelacion,
+        values:[id,idTec]
+    }
+    
+    const queryResultRealacio= await client.query(queryConfigRelacion) 
+
+    if(queryResultRealacio.rows.length===0){
+        return res.status(404).json({message:`Technology ${name} not found on this Project.`})
+    }
+
+   const idRelacion =queryResultRealacio.rows[0].id
+   
+
+    const queryString:string=`
+
+        DELETE FROM projects_technologies
+        WHERE
+        id=$1
+    `
+    const queryConfig:QueryConfig={
+        text:queryString,values:[idRelacion]
+    }
+
+    await client.query(queryConfig)
+
+    return res.status(204).json(queryResultRealacio.rows)
 }

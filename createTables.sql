@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS  projects_technologies(
 INSERT INTO technologies("name") VALUES('javaScript') RETURNING*;
 
 ALTER TABLE developers ADD COLUMN "developerInfoId" INTEGER UNIQUE ;
-ALTER TABLE developers ADD FOREIGN KEY ("developerInfoId") REFERENCES developer_infos("id") ON DELETE CASCADE;
+ALTER TABLE developers ADD FOREIGN KEY ("developerInfoId") REFERENCES developer_infos("infoId") ON DELETE CASCADE;
 
 ALTER TABLE projects ADD COLUMN "developerId" INTEGER ;
 ALTER TABLE projects ADD FOREIGN KEY ("developerId") REFERENCES developers("id") ON DELETE CASCADE;

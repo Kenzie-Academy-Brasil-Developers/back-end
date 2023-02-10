@@ -1,6 +1,6 @@
 import { Request , Response } from 'express';
 import format from 'pg-format';
-import {DeveloperResult, IDeveloper, RequeridDeveloper,DeveloperResultReacion, RequeridDeveloperInfo, DeveloperInfoResult, IDeveloperBody} from '../interfaces/interfaceDeveloper'
+import {DeveloperResult, IDeveloper, RequeridDeveloper,DeveloperResultReacion, RequeridDeveloperInfo, DeveloperInfoResult, IDeveloperBody, DeveloperAndProjectsResult} from '../interfaces/interfaceDeveloper'
 import { client } from '../database';
 import { QueryConfig } from 'pg';
 
@@ -252,7 +252,7 @@ export const updateInfoDeveloperId = async (req:Request , res:Response):Promise<
     const queryConfig:QueryConfig={
         text:queryString,values:[id]
     }
-    const queryResult=  await client.query(queryConfig)
+    const queryResult:DeveloperResultReacion=  await client.query(queryConfig)
 
     const idInfo = queryResult.rows[0].developerInfoId
     
@@ -270,7 +270,7 @@ export const updateInfoDeveloperId = async (req:Request , res:Response):Promise<
         values:[idInfo]
     }
 
-    const queryResultInfo=  await client.query(queryConfigInfo)
+    const queryResultInfo :DeveloperInfoResult=  await client.query(queryConfigInfo)
    
 
 
@@ -317,30 +317,4 @@ export const deletDeveloper = async (req:Request , res:Response):Promise<Respons
      await client.query(queryConfigDelet)
 
     return res.status(204).json()
-}
-
-
-export const readProjectDeveloperById = async (req:Request , res:Response):Promise<Response>=>{
-
-    const id:number = parseInt(req.params.id)
-
-    const queryString:string= `
-    SELECT 
-    dv.*,
-    dvi."developerSince",
-    dvi."preferredOS",
-    FROM developers AS dv
-    LEFT JOIN developer_infos AS dvi
-    ON dv."developerInfoId"= dvi."id"
-        JOIN projects AS pj
-    ON dv."id"= pj."developerId"
-       LEFT JOIN projects_technologies AS pjt
-    ON  pj."id"= pjt."projectId"
-    
-    
-    
-; 
-    ` 
-    const queryResult = await client.query(queryString)
-    return res.status(200).json(queryResult.rows)
 }

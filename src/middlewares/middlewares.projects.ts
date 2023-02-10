@@ -27,6 +27,7 @@ export const verifyIdProject = async(req:Request , res:Response, next:NextFuncti
 
         return res.status(404).json({message:"Project not found."})
     }
+    req.start = queryResult.rows[0].startDate
 
     return next()
 }

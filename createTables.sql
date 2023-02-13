@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS  projects_technologies(
 "addedIn" DATE NOT NULL
 );
 
-INSERT INTO technologies("name") VALUES('javaScript') RETURNING*;
 
 ALTER TABLE developers ADD COLUMN "developerInfoId" INTEGER UNIQUE ;
 ALTER TABLE developers ADD FOREIGN KEY ("developerInfoId") REFERENCES developer_infos("infoId") ON DELETE CASCADE;
@@ -47,9 +46,5 @@ ALTER TABLE projects_technologies ADD FOREIGN KEY ("projectId") REFERENCES proje
 
 ALTER TABLE projects_technologies ADD COLUMN "technologyId" INTEGER   NOT NULL;
 ALTER TABLE projects_technologies ADD FOREIGN KEY ("technologyId") REFERENCES technologies("id") ON DELETE SET NULL;
-
-INSERT INTO developers ("name","email") VALUES ('teste','teste@mail') RETURNING*;
-SELECT dv.*,dvi."developerSince",dvi."preferredOS" FROM developers dv JOIN developer_infos dvi ON dv."developerInfoId" = dvi.id;
-
 
 ALTER TABLE developers DROP CONSTRAINT "developers_developerInfoId_fkey"

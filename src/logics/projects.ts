@@ -60,7 +60,15 @@ export const creatProject = async (req:Request , res:Response):Promise<Response>
 export const readProjects =  async(req:Request , res:Response):Promise<Response>=>{
 
     const queryString:string = `
-    SELECT pj.*,
+    SELECT 
+        pj."id" AS "projectId",
+        pj."name" AS "projectName",
+        pj."description" AS "projectDescription",
+        pj."estimatedTime" AS "projectEstimatedTime",
+        pj."repository" AS "projectRepository",
+        pj."startDate" AS "projectStartDate",
+        pj."startDate" AS "projectStartDate",
+        pj."endDate" AS "projectEndDate",
         pjt."technologyId",
         tec."tecName"
     FROM projects AS pj 
@@ -80,7 +88,15 @@ export const readProjectsById =  async(req:Request , res:Response):Promise<Respo
     const id:number = parseInt(req.params.id) 
 
     const queryString:string = `
-    SELECT pj.*,
+    SELECT 
+        pj."id" AS "projectId",
+        pj."name" AS "projectName",
+        pj."description" AS "projectDescription",
+        pj."estimatedTime" AS "projectEstimatedTime",
+        pj."repository" AS "projectRepository",
+        pj."startDate" AS "projectStartDate",
+        pj."startDate" AS "projectStartDate",
+        pj."endDate" AS "projectEndDate",
         pjt."technologyId",
         tec."tecName"
     FROM projects AS pj 

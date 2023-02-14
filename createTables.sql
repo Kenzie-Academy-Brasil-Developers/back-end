@@ -36,15 +36,16 @@ CREATE TABLE IF NOT EXISTS  projects_technologies(
 
 
 ALTER TABLE developers ADD COLUMN "developerInfoId" INTEGER UNIQUE ;
-ALTER TABLE developers ADD FOREIGN KEY ("developerInfoId") REFERENCES developer_infos("infoId") ON DELETE CASCADE;
+ALTER TABLE developers ADD FOREIGN KEY ("developerInfoId") REFERENCES developer_infos("id") ON DELETE CASCADE;
 
 ALTER TABLE projects ADD COLUMN "developerId" INTEGER ;
-ALTER TABLE projects ADD FOREIGN KEY ("developerId") REFERENCES developers("developId") ON DELETE CASCADE;
+ALTER TABLE projects ADD FOREIGN KEY ("developerId") REFERENCES developers("id") ON DELETE CASCADE;
 
 ALTER TABLE projects_technologies ADD COLUMN "projectId" INTEGER NOT NULL ;
 ALTER TABLE projects_technologies ADD FOREIGN KEY ("projectId") REFERENCES projects("id") ON DELETE CASCADE;
 
+
 ALTER TABLE projects_technologies ADD COLUMN "technologyId" INTEGER   NOT NULL;
 ALTER TABLE projects_technologies ADD FOREIGN KEY ("technologyId") REFERENCES technologies("id") ON DELETE SET NULL;
 
-ALTER TABLE developers DROP CONSTRAINT "developers_developerInfoId_fkey"
+

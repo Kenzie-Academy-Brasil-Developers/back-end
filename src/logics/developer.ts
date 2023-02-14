@@ -40,7 +40,7 @@ export const validadeDeveloperInfo = (obj:any):IDeveloper|any=>{
 }
 export const validadeUpdateDeveloper = (obj:any):IDeveloper|any=>{
 
-    if(obj.developerName===undefined && obj.email===undefined){
+    if(obj.name===undefined && obj.email===undefined){
         throw new Error(`At least one of those keys must be send,key:developerName,email`);       
     }
     const keys:string[] = Object.keys(obj) 
@@ -112,12 +112,14 @@ export const readDevelopers = async(req:Request , res:Response):Promise<Response
 
     const queryString:string =`
     SELECT
-         dv.*,
+         dv."id" AS "developerID",
+         dv."name" AS "developerName",
+         dv."email" AS "developerEmail",  
          dvi."developerSince",
          dvi."preferredOS" 
     FROM developers AS dv 
     LEFT  JOIN developer_infos AS dvi 
-    ON dv."developerInfoId" = dvi."infoId";`
+    ON dv."developerInfoId" = dvi."id";`
     const queryResult:DeveloperResultReacion = await client.query(queryString)
     return res.status(200).json(queryResult.rows)
 
@@ -127,14 +129,16 @@ export const readDevelopersId = async(req:Request , res:Response):Promise<Respon
 
     const queryString:string =`
     SELECT
-        dv.*,
+        dv."id" AS "developerID",
+        dv."name" AS "developerName",
+        dv."email" AS "developerEmail",
         dvi."developerSince",
         dvi."preferredOS" 
     FROM developers AS dv 
     LEFT  OUTER JOIN developer_infos AS dvi 
-    ON dv."developerInfoId" = dvi."infoId"
+    ON dv."developerInfoId" = dvi."id"
     WHERE
-      dv."developId"=$1
+      dv."id"=$1
     ;  
     `
       const queryConfig :QueryConfig={
@@ -170,16 +174,16 @@ export const createInfoDeveloper = async(req:Request , res:Response):Promise<Res
     UPDATE developers
       SET("developerInfoId") = ROW($1)
       WHERE 
-       "developId"=$2
+       "id"=$2
        RETURNING *; 
     `
     const queryConfigUpdate:QueryConfig={
         text:queryStringUpdate,
-        values:[queryResult.rows[0].infoId,id]
+        values:[queryResult.rows[0].id,id]
     }
 
-    await client.query(queryConfigUpdate)
-
+      await client.query(queryConfigUpdate)
+   
    
 
     return res.status(201).json(queryResult.rows[0])
@@ -212,7 +216,7 @@ export const updateDeveloper = async(req:Request , res:Response):Promise<Respons
     UPDATE developers
     SET(%I) = ROW(%L)
     WHERE 
-     "developId"=$1
+     "id"=$1
      RETURNING *
      ;
     `,keys,value)
@@ -248,7 +252,7 @@ export const updateInfoDeveloperId = async (req:Request , res:Response):Promise<
     SELECT *
     FROM developers
     WHERE 
-    "developId"=$1;
+    "id"=$1;
 `
     const queryConfig:QueryConfig={
         text:queryString,values:[id]
@@ -262,7 +266,7 @@ export const updateInfoDeveloperId = async (req:Request , res:Response):Promise<
         UPDATE developer_infos
         SET(%I)=ROW(%L)
         WHERE 
-        "infoId"=$1
+        "id"=$1
         RETURNING *
     `,keys,values)
 
@@ -297,7 +301,7 @@ export const deletDeveloper = async (req:Request , res:Response):Promise<Respons
     SELECT *
     FROM developers
     WHERE 
-    "developId"=$1;
+    "id"=$1;
 `
     const queryConfig:QueryConfig={
         text:queryString,values:[id]
@@ -308,7 +312,7 @@ export const deletDeveloper = async (req:Request , res:Response):Promise<Respons
     const queryStringDelet:string=`
     DELETE FROM developer_infos
     WHERE
-    "infoId"=$1  
+    "id"=$1  
     `
 
     const queryConfigDelet:QueryConfig={

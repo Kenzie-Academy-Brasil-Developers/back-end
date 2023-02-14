@@ -9,7 +9,10 @@ export const readProjectDeveloperById = async (req:Request , res:Response):Promi
 
     const queryString:string= `
     SELECT 
-        dv.*,
+        dv."id" AS "developerID",
+        dv."name" AS "developerName",
+        dv."email" AS "developerEmail",  
+        dvi."id" AS "developerInfoID",
         dvi."developerSince",
         dvi."preferredOS",
         pj."id" AS "projectID",
@@ -23,16 +26,16 @@ export const readProjectDeveloperById = async (req:Request , res:Response):Promi
         tec."tecName" AS "technologyName"
     FROM developers AS dv
     LEFT JOIN developer_infos AS dvi
-    ON dv."developerInfoId"= dvi."infoId"
+    ON dv."developerInfoId"= dvi."id"
        LEFT JOIN projects AS pj
-    ON dv."developId"= pj."developerId"
+    ON dv."id"= pj."developerId"
        LEFT JOIN projects_technologies AS pjt
     ON  pj."id"= pjt."projectId"
     LEFT JOIN technologies AS tec
     ON  pjt."technologyId"= tec."id"
 
     WHERE 
-    dv."developId"=$1
+    dv."id"=$1
 ;
     ` 
 

@@ -13,7 +13,7 @@ export const verifyIdDeveloper = async(req:Request , res:Response, next:NextFunc
     SELECT *
      FROM developers
      WHERE
-     "developId"=$1
+     "id"=$1
     ; `
 
     const queryConfig :QueryConfig={

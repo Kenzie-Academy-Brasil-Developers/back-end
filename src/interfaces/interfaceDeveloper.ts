@@ -1,11 +1,11 @@
 import { QueryResult } from "pg"
 
 export interface IDeveloper{
-    developerName:string,
+    name:string,
     email:string
 }
 export interface IDeveloperBody extends IDeveloper{
-    developId: number
+    id: number
     developerInfoId:null|number
 }
 export interface IDeveloperBodyRelacion extends IDeveloperBody{
@@ -18,7 +18,7 @@ export interface IDeveloperInfo{
     preferredOS:string
 }
 export interface IDeveloperInfoResult extends IDeveloperInfo{
-    infoId:number
+    id:number
 }
 
 export interface IdeveloperAndProject {

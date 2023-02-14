@@ -7,7 +7,7 @@ import { QueryConfig } from 'pg';
 export const validadeDeveloper = (obj:any):IDeveloper|any=>{
     const keys:string[] = Object.keys(obj) 
 
-    const verify:RequeridDeveloper[] = ['developerName','email']
+    const verify:RequeridDeveloper[] = ['name','email']
     const verifyResult = verify.every(element=>keys.includes(element))
     /* | */
     if(!verifyResult ){
@@ -16,7 +16,7 @@ export const validadeDeveloper = (obj:any):IDeveloper|any=>{
     }
 
     const newObjetc = {
-        developerName: obj.developerName,
+        name: obj.name,
         email:obj.email
     }
     return newObjetc
@@ -45,7 +45,7 @@ export const validadeUpdateDeveloper = (obj:any):IDeveloper|any=>{
     }
     const keys:string[] = Object.keys(obj) 
 
-    const verify = ['developerName','email']
+    const verify = ['name','email']
     
     const verifyResult:boolean = keys.every(element=>verify.includes(element))
 
@@ -54,6 +54,7 @@ export const validadeUpdateDeveloper = (obj:any):IDeveloper|any=>{
         const keyes =  verify.join(',')
         throw new Error(`it is only allowed to update one of these keys:${keyes}`); 
     }
+
     return obj 
 }
 export const validadeUpdateDeveloperInfo = (obj:any):IDeveloper|any=>{

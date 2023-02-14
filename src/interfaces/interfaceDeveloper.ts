@@ -43,5 +43,5 @@ export type DeveloperResult = QueryResult<IDeveloperBody>
 export type DeveloperResultReacion = QueryResult<IDeveloperBodyRelacion>
 export type DeveloperInfoResult = QueryResult<IDeveloperInfoResult>
 export type DeveloperAndProjectsResult = QueryResult<IdeveloperAndProject>
-export type RequeridDeveloper = 'developerName' |'email' 
+export type RequeridDeveloper = 'name' |'email' 
 export type RequeridDeveloperInfo = 'developerSince' |'preferredOS' 
